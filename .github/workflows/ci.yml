@@ -1,3 +1,4 @@
+
 name: ci
 
 on:
@@ -20,3 +21,29 @@ jobs:
 
       - name: Run tests
         run: go test -cover ./...
+
+  style:
+    name: Styles
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Check out code
+        uses: actions/checkout@v6
+
+      - name: Set up Go
+        uses: actions/setup-go@v6
+        with:
+          go-version: "1.27.1"
+
+      - name: Check code formatting
+        run: |
+          unformatted=$(find . -type d -name vendor -prune -o -type f -name '*.go' -exec gofmt -l {} +)
+
+          if [ -n "$unformatted" ]; then
+            echo "The following files need formatting:"
+            echo "$unformatted"
+            exit 1
+          fi
+
+          echo "All Go files are properly formatted."
+
